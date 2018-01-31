@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en" data-framework="jquery">
+
+<head>
+	<meta charset="utf-8">
+	<title>NEJ • TodoMVC</title>
+	<link rel="stylesheet" href="static/todo.css">
+</head>
+
+<body>
+	<section id="todoapp">
+		<header id="header">
+			<h1>NEJ • Todo</h1>
+			<input id="new-todo" placeholder="Input something to do!" autofocus>
+		</header>
+		<section id="main">
+			<input id="toggle-all" type="checkbox">
+			<label for="toggle-all">Mark all as complete</label>
+			<ul id="todo-list">
+				<li class="completed" data-id="">
+					<div class="view">
+						<input class="toggle" type="checkbox" checked>
+						<label>to cook my dinner!</label>
+						<button class="destroy"></button>
+					</div>
+					<input class="edit" value="">
+				</li>
+				<li data-id="">
+					<div class="view">
+						<input class="toggle" type="checkbox" checked>
+						<label>to cook my luncha!</label>
+						<button class="destroy"></button>
+					</div>
+					<input class="edit" value="">
+				</li>
+			</ul>
+		</section>
+		<footer id="footer">
+			<span id="todo-count">
+				<strong>1</strong> item/items left</span>
+			<ul id="filters">
+				<li>
+					<a class="selected" href="#/all">All</a>
+				</li>
+				<li>
+					<a class="selected" href="#/active">Active</a>
+				</li>
+				<li>
+					<a class="selected" href="#/completed">Completed</a>
+				</li>
+			</ul>
+		</footer>
+	</section>
+
+</body>
+
+</html>
