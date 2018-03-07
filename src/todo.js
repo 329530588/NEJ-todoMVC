@@ -1,14 +1,16 @@
 import './index.html';
 import '../static/app.scss';
-import element from 'nej-commonjs/base/element'
-import event from 'nej-commonjs/base/event'
-import tpl from 'nej-commonjs/util/template/tpl'
-import dolar from 'nej-commonjs/util/chain/NodeList'
+import element from 'nej-commonjs/base/element';
+import event from 'nej-commonjs/base/event';
+import tpl from 'nej-commonjs/util/template/tpl';
+import dolar from 'nej-commonjs/util/chain/NodeList';
 
-let todos = [{ 'text': '起床', status: 'completed' }, { 'text': '小便', status: 'active' }, { 'text': '刷牙', status: 'active' }];
+
+// 前端缓存todos数据
+let todos;
 
 const addTODO = (todo) => {
-    let tpl = `<li class="${todo.status === 'completed' ? 'completed' : ''}" data-text="${todo.text}">
+    let tpl = `<li class="${todo.status === 'completed' ? 'completed' : ''}" data-id="${todo._id}">
             <div class="view">
                 <input class="toggle" type="checkbox" ${todo.status === 'completed' ? 'checked' : ''}>
                 <label>${todo.text}</label>
@@ -31,6 +33,7 @@ const initEvent = () => {
     dolar('#new-todo')._$addEvent('keydown', e => {
         if (e.code === 'Enter') {
             let text = e.target.value.trim()
+            // 排除空输入
             if (!text) {
                 return;
             }
@@ -38,51 +41,82 @@ const initEvent = () => {
                 text: text,
                 status: 'active'
             };
-            todos.push(todo);
-            addTODO(todo);
-            e.target.value = '';
-            updateCount();
-            console.log('[new TODO]', e);
+            fetch('http://localhost:3000/api/todos', {
+                'method': 'POST',
+                'headers': new Headers({
+                    "Content-Type": "application/json"
+                }),
+                'body': JSON.stringify(todo)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert('错误：' + error);
+                        return;
+                    }
+                    console.log('[fetch new-todo]', data);
+                    todo.id = data.id;
+                    addTODO(todo);
+                    e.target.value = '';
+                    updateCount();
+                    console.log('[new TODO]', e);
+                });
         }
     });
 
     dolar('#todo-list')._$addEvent('click', e => {
         const ele = e.target;
-        let li;
+        let li, id;
         // 事件代理
         switch (ele.className) {
             case 'destroy': // 删除TODOs
                 li = dolar(e.target)._$parent('li')[0];
-                let label = li.dataset.text
-                element._$remove(li, false);
-                todos = todos.filter((todo) => todo.text !== label);
-                updateCount();
-                console.log('[destroy]', label);
+                id = li.dataset.id
+                fetch(`http://localhost:3000/api/todos/${id}`, {
+                    'method': 'DELETE',
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('错误：' + error);
+                            return;
+                        }
+                        element._$remove(li, false);
+                        updateCount();
+                        console.log('[destroy]', id);
+                    });
                 break;
             case 'toggle': // toggle TODO
                 li = dolar(e.target)._$parent('li')[0];
+                id = li.dataset.id;
                 let newStatus;
-                if (element._$hasClassName(li, 'completed')) {
-                    element._$delClassName(li, 'completed');
-                    newStatus = 'active';
-                } else {
-                    element._$addClassName(li, 'completed');
-                    newStatus = 'completed';
-                }
-                todos.forEach(todo => {
-                    if(todo.text === li.dataset.text) {
-                        todo.status = newStatus
-                    }
-                });
-                updateCount();
-                console.log('[toggle TODO]');
+                fetch(`http://localhost:3000/api/todos/${id}`, {
+                    'method': 'PATCH',
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            alert('错误：' + error);
+                            return;
+                        }
+                        if (element._$hasClassName(li, 'completed')) {
+                            element._$delClassName(li, 'completed');
+                            newStatus = 'active';
+                        } else {
+                            element._$addClassName(li, 'completed');
+                            newStatus = 'completed';
+                        }
+                        updateCount();
+                        console.log('[toggle TODO]');
+                    });
         }
     });
 
     // filter TODO
     dolar('#filters > li > a')._$addEvent('click', e => {
+        // 改变active样式
         dolar('#filters > li > a')._$forEach((a) => {
-            if(element._$hasClassName(a, 'selected')) {
+            if (element._$hasClassName(a, 'selected')) {
                 element._$delClassName(a, 'selected');
             }
         });
@@ -92,10 +126,23 @@ const initEvent = () => {
 
     window.onhashchange = (e) => {
         const filter = location.hash.slice(2);
-        renderTODOS(filter);
-        console.log('[change hash]', e, location.hash);
+        fetch(`http://localhost:3000/api/todos/${filter}`, {
+            'method': 'GET'
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert('错误：' + error);
+                    return;
+                }
+                todos = data;
+                renderTODOS(filter);
+                console.log('[change hash]', e, location.hash);
+            });
     }
 }
+
+
 
 const renderTODOS = (filter) => {
     // 清除旧状态
@@ -113,11 +160,22 @@ const renderTODOS = (filter) => {
 }
 
 const initTODOS = () => {
-    renderTODOS();
-    updateCount();
-    initEvent();
+    fetch('http://localhost:3000/api/todos', {
+        'method': 'GET'
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert('错误：' + error);
+                return;
+            }
+            console.log('[fetch data]', data);
+            todos = data;
+            renderTODOS();
+            updateCount();
+            initEvent();
+        });
 }
-
 
 // 初始化TODO应用
 initTODOS();
