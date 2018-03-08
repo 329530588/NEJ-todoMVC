@@ -5,9 +5,8 @@ import event from 'nej-commonjs/base/event';
 import tpl from 'nej-commonjs/util/template/tpl';
 import dolar from 'nej-commonjs/util/chain/NodeList';
 
-
 // 前端缓存todos数据
-let todos;
+let todos = [];
 
 const addTODO = (todo) => {
     let tpl = `<li class="${todo.status === 'completed' ? 'completed' : ''}" data-id="${todo._id}">
@@ -55,10 +54,14 @@ const initEvent = () => {
                         return;
                     }
                     console.log('[fetch new-todo]', data);
-                    todo.id = data.id;
-                    addTODO(todo);
+                    todo._id = data._id;
+                    if(location.hash.slice(2) !== 'completed') {
+                        addTODO(todo);
+                    }
+                    todos.push(todo);
                     e.target.value = '';
                     updateCount();
+                    alert('TODO添加成功');  
                     console.log('[new TODO]', e);
                 });
         }
@@ -71,7 +74,7 @@ const initEvent = () => {
         switch (ele.className) {
             case 'destroy': // 删除TODOs
                 li = dolar(e.target)._$parent('li')[0];
-                id = li.dataset.id
+                id = li.dataset.id;
                 fetch(`http://localhost:3000/api/todos/${id}`, {
                     'method': 'DELETE',
                 })
@@ -82,6 +85,7 @@ const initEvent = () => {
                             return;
                         }
                         element._$remove(li, false);
+                        todos = todos.filter(todo => todo._id !== id);
                         updateCount();
                         console.log('[destroy]', id);
                     });
@@ -90,6 +94,7 @@ const initEvent = () => {
                 li = dolar(e.target)._$parent('li')[0];
                 id = li.dataset.id;
                 let newStatus;
+                let filter = location.hash.slice(2);
                 fetch(`http://localhost:3000/api/todos/${id}`, {
                     'method': 'PATCH',
                 })
@@ -105,6 +110,14 @@ const initEvent = () => {
                         } else {
                             element._$addClassName(li, 'completed');
                             newStatus = 'completed';
+                        }
+                        todos.forEach(todo => {
+                            if(todo._id === id) {
+                                todo.status = newStatus;
+                            }
+                        });
+                        if(newStatus !== filter && filter !== 'all') {
+                            element._$remove(li, false);
                         }
                         updateCount();
                         console.log('[toggle TODO]');
@@ -126,19 +139,8 @@ const initEvent = () => {
 
     window.onhashchange = (e) => {
         const filter = location.hash.slice(2);
-        fetch(`http://localhost:3000/api/todos/${filter}`, {
-            'method': 'GET'
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    alert('错误：' + error);
-                    return;
-                }
-                todos = data;
-                renderTODOS(filter);
-                console.log('[change hash]', e, location.hash);
-            });
+        renderTODOS(filter);
+        console.log('[change hash]', e, location.hash);
     }
 }
 
