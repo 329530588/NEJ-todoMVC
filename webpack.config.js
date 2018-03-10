@@ -53,7 +53,7 @@ module.exports = {
   devServer: {
     publicPath: "/",
     port: 2333,
-    host: "localhost",
+    host: "0.0.0.0",
     hot: true // hot module replacement. Depends on HotModuleReplacementPlugin
   }
 };

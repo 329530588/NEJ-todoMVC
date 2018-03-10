@@ -7,6 +7,7 @@ import dolar from 'nej-commonjs/util/chain/NodeList';
 
 // 前端缓存todos数据
 let todos = [];
+let server = '0.0.0.0';
 
 const addTODO = (todo) => {
     let tpl = `<li class="${todo.status === 'completed' ? 'completed' : ''}" data-id="${todo._id}">
@@ -40,7 +41,7 @@ const initEvent = () => {
                 text: text,
                 status: 'active'
             };
-            fetch('http://localhost:3000/api/todos', {
+            fetch(`http://${server}:3000/api/todos`, {
                 'method': 'POST',
                 'headers': new Headers({
                     "Content-Type": "application/json"
@@ -75,7 +76,7 @@ const initEvent = () => {
             case 'destroy': // 删除TODOs
                 li = dolar(e.target)._$parent('li')[0];
                 id = li.dataset.id;
-                fetch(`http://localhost:3000/api/todos/${id}`, {
+                fetch(`http://${server}:3000/api/todos/${id}`, {
                     'method': 'DELETE',
                 })
                     .then(res => res.json())
@@ -95,7 +96,7 @@ const initEvent = () => {
                 id = li.dataset.id;
                 let newStatus;
                 let filter = location.hash.slice(2);
-                fetch(`http://localhost:3000/api/todos/${id}`, {
+                fetch(`http://${server}:3000/api/todos/${id}`, {
                     'method': 'PATCH',
                 })
                     .then(res => res.json())
@@ -162,7 +163,7 @@ const renderTODOS = (filter) => {
 }
 
 const initTODOS = () => {
-    fetch('http://localhost:3000/api/todos', {
+    fetch(`http://${server}:3000/api/todos`, {
         'method': 'GET'
     })
         .then(res => res.json())
