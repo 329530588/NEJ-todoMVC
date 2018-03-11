@@ -93,5 +93,5 @@ MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     console.log("connect to mongo...");
     db = client.db(dbName);
-    app.listen(3000, '0.0.0.0');
+    app.listen(82, '0.0.0.0');
 });
