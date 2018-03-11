@@ -1,5 +1,5 @@
 import './index.html';
-import '../static/app.scss';
+// import './app.scss';
 import element from 'nej-commonjs/base/element';
 import event from 'nej-commonjs/base/event';
 import tpl from 'nej-commonjs/util/template/tpl';

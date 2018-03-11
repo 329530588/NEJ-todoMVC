@@ -3,14 +3,14 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const extractPlugin = new ExtractTextPlugin({
-    filename: './static/app.css'
+    filename: './public/css/app.css'
 });
 
 module.exports = {
   devtool: "cheap-eval-source-map",
   entry: ["./src/todo.js", "webpack-dev-server/client?http://localhost:2333"],
   output: {
-    filename: "./dist/bundle.js"
+    filename: "./public/dist/bundle.js"
   },
   module: {
     rules: [

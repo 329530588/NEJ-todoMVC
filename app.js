@@ -2,7 +2,8 @@ const mongodb = require('mongodb');
 const MongoClient = mongodb.MongoClient;
 const assert = require('assert');
 const bodyParser = require('body-parser');
-const app = require('express')();
+const express = require('express');
+const app = express();
 
 // Connection URL
 const url = 'mongodb://localhost:27017';
@@ -10,6 +11,9 @@ const url = 'mongodb://localhost:27017';
 const dbName = 'todo';
 let db;
 
+// 静态资源目录配置
+app.use(express.static('public'));
+// http json处理
 app.use(bodyParser.json());
 // 跨域设置
 app.all('*', (req, res, next) => {
@@ -17,6 +21,11 @@ app.all('*', (req, res, next) => {
     res.header('Access-Control-Allow-Headers', '*');
     res.header('Access-Control-Allow-Methods', '*');
     next();
+});
+
+// home
+app.get('/', (req, res) => {
+    res.sendfile('./index.html');
 });
 
 // get todos
