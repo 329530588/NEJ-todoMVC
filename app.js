@@ -4,6 +4,7 @@ const assert = require('assert');
 const bodyParser = require('body-parser');
 const express = require('express');
 const app = express();
+const path = require('path');
 
 // Connection URL
 const url = 'mongodb://localhost:27017';
@@ -25,7 +26,7 @@ app.all('*', (req, res, next) => {
 
 // home
 app.get('/', (req, res) => {
-    res.sendfile('./index.html');
+    res.sendFile(path.join(__dirname ,'index.html'));
 });
 
 // get todos
@@ -92,5 +93,5 @@ MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     console.log("connect to mongo...");
     db = client.db(dbName);
-    app.listen(3000);
+    app.listen(3000, '0.0.0.0');
 });
