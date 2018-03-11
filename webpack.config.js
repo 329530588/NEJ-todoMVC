@@ -42,6 +42,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new webpack.optimize.UglifyJsPlugin(),
     new webpack.DefinePlugin({
       DEBUG: JSON.stringify(false), // 是否为 debug 模式
       CMPT: JSON.stringify(true) // 是否开启兼容模式，即 `NEJ.C('xxx')`

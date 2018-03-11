@@ -7,7 +7,7 @@ import dolar from 'nej-commonjs/util/chain/NodeList';
 
 // 前端缓存todos数据
 let todos = [];
-let server = '0.0.0.0:82';
+let server = '119.29.243.115:82';
 
 const addTODO = (todo) => {
     let tpl = `<li class="${todo.status === 'completed' ? 'completed' : ''}" data-id="${todo._id}">
