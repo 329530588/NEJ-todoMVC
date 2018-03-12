@@ -117,7 +117,7 @@ const initEvent = () => {
                                 todo.status = newStatus;
                             }
                         });
-                        if(newStatus !== filter && filter !== 'all') {
+                        if(filter && newStatus !== filter && filter !== 'all') {
                             element._$remove(li, false);
                         }
                         updateCount();
